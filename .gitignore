@@ -26,3 +26,9 @@ lerna-debug.log*
 
 # misc
 .DS_Store
+# Terraformの実行バイナリなどを除外
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+*.tfvars.json
