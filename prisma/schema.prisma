@@ -1,0 +1,86 @@
+// This is your Prisma schema file
+// Standard configuration for Modern Accounting System
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AccountCategory {
+  ASSET
+  LIABILITY
+  EQUITY
+  REVENUE
+  EXPENSE
+}
+
+enum EntryLineType {
+  DEBIT
+  CREDIT
+}
+
+/// 勘定科目マスタ。仕訳入力や財務諸表集計の基準になる科目定義を保持する。
+model Account {
+  /// 勘定科目の内部識別子。
+  id        Int                @id @default(autoincrement())
+  /// 画面表示に使用する勘定科目名。
+  name      String
+  /// 一意制約を持つ勘定科目コード。
+  code      String             @unique
+  /// 勘定科目の区分。残高計算や財務諸表区分で利用する。
+  category  AccountCategory
+  /// この勘定科目を参照する仕訳明細の一覧。
+  lines     JournalEntryLine[]
+  /// レコード作成日時。
+  createdAt DateTime           @default(now())
+  /// レコード更新日時。
+  updatedAt DateTime           @updatedAt
+}
+
+/// 仕訳伝票ヘッダ。取引日、摘要、および複数の仕訳明細を束ねる。
+model JournalEntry {
+  /// 仕訳伝票の内部識別子。
+  id          Int                @id @default(autoincrement())
+  /// 仕訳日付。
+  entryDate   DateTime
+  /// 取引内容を表す摘要。
+  description String
+  /// この伝票に属する借方・貸方明細。
+  lines       JournalEntryLine[]
+  /// レコード作成日時。
+  createdAt   DateTime           @default(now())
+  /// レコード更新日時。
+  updatedAt   DateTime           @updatedAt
+}
+
+/// 仕訳明細。1 行ごとの借方・貸方情報と金額を保持する。
+model JournalEntryLine {
+  /// 仕訳明細の内部識別子。
+  id             Int          @id @default(autoincrement())
+  /// 親となる仕訳伝票 ID。
+  journalEntryId Int
+  /// 対象となる勘定科目 ID。
+  accountId      Int
+  /// 借方または貸方の区分。
+  type           EntryLineType
+  /// 金額。小数点 2 桁まで保持する。
+  amount         Decimal      @db.Decimal(18, 2)
+  /// レコード作成日時。
+  createdAt      DateTime     @default(now())
+  /// レコード更新日時。
+  updatedAt      DateTime     @updatedAt
+
+  /// 親の仕訳伝票への参照。
+  journalEntry JournalEntry @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+  /// 勘定科目マスタへの参照。
+  account      Account      @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  /// 仕訳伝票単位の検索を高速化するインデックス。
+  @@index([journalEntryId])
+  /// 勘定科目単位の検索を高速化するインデックス。
+  @@index([accountId])
+}

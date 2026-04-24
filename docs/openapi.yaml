@@ -1,0 +1,367 @@
+openapi: 3.0.3
+info:
+  title: Modern Accounting App API
+  version: 1.0.0
+  description: |
+    モダン会計システムのバックエンド API 定義です。
+    現在の `src/routes/*.ts` 実装に基づいています。
+servers:
+  - url: http://localhost:3001
+    description: Local development
+tags:
+  - name: Accounts
+  - name: Journal Entries
+  - name: Reports
+paths:
+  /accounts:
+    get:
+      tags: [Accounts]
+      summary: 勘定科目一覧を取得する
+      responses:
+        '200':
+          description: 勘定科目一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+    post:
+      tags: [Accounts]
+      summary: 勘定科目を登録する
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccountRequest'
+      responses:
+        '201':
+          description: 登録成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '400':
+          description: 入力エラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /journal-entries:
+    get:
+      tags: [Journal Entries]
+      summary: 仕訳一覧を取得する
+      parameters:
+        - in: query
+          name: accountId
+          schema:
+            type: integer
+          description: 指定した勘定科目を借方または貸方に含む仕訳のみ返す
+        - in: query
+          name: dateFrom
+          schema:
+            type: string
+            format: date
+          description: 仕訳日の開始日
+        - in: query
+          name: dateTo
+          schema:
+            type: string
+            format: date
+          description: 仕訳日の終了日
+      responses:
+        '200':
+          description: 仕訳一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JournalEntry'
+        '400':
+          description: クエリパラメータエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags: [Journal Entries]
+      summary: 仕訳を登録する
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateJournalEntryRequest'
+      responses:
+        '201':
+          description: 登録成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalEntry'
+        '400':
+          description: 入力エラーまたは貸借不一致
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /journal-entries/{id}:
+    delete:
+      tags: [Journal Entries]
+      summary: 仕訳を削除する
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 削除成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteSuccessResponse'
+        '400':
+          description: ID が不正
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: 対象の伝票が見つからない
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /ledger/{accountId}:
+    get:
+      tags: [Journal Entries]
+      summary: 勘定科目別元帳データを取得する
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 元帳データ一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LedgerLine'
+  /reports/all-lines:
+    get:
+      tags: [Reports]
+      summary: 全仕訳明細を取得する
+      responses:
+        '200':
+          description: 明細一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JournalEntryLine'
+  /reports/financial-statements:
+    get:
+      tags: [Reports]
+      summary: 財務諸表サマリを取得する
+      responses:
+        '200':
+          description: 財務諸表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialReport'
+components:
+  schemas:
+    AccountCategory:
+      type: string
+      enum:
+        - ASSET
+        - LIABILITY
+        - EQUITY
+        - REVENUE
+        - EXPENSE
+    EntryLineType:
+      type: string
+      enum:
+        - DEBIT
+        - CREDIT
+    Account:
+      type: object
+      required:
+        - id
+        - name
+        - code
+        - category
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        code:
+          type: string
+        category:
+          $ref: '#/components/schemas/AccountCategory'
+    CreateAccountRequest:
+      type: object
+      required:
+        - name
+        - code
+        - category
+      properties:
+        name:
+          type: string
+        code:
+          type: string
+        category:
+          $ref: '#/components/schemas/AccountCategory'
+    AccountRef:
+      type: object
+      properties:
+        name:
+          type: string
+    JournalEntryLine:
+      type: object
+      required:
+        - accountId
+        - type
+        - amount
+      properties:
+        accountId:
+          type: integer
+        type:
+          $ref: '#/components/schemas/EntryLineType'
+        amount:
+          type: number
+        account:
+          $ref: '#/components/schemas/AccountRef'
+    CreateJournalEntryLine:
+      type: object
+      required:
+        - accountId
+        - type
+        - amount
+      properties:
+        accountId:
+          type: integer
+        type:
+          $ref: '#/components/schemas/EntryLineType'
+        amount:
+          type: number
+          minimum: 0.01
+        description:
+          type: string
+          nullable: true
+    JournalEntry:
+      type: object
+      required:
+        - id
+        - entryDate
+        - description
+        - lines
+      properties:
+        id:
+          type: integer
+        entryDate:
+          type: string
+          format: date-time
+        description:
+          type: string
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/JournalEntryLine'
+    CreateJournalEntryRequest:
+      type: object
+      required:
+        - entryDate
+        - description
+        - lines
+      properties:
+        entryDate:
+          type: string
+          format: date
+        description:
+          type: string
+        lines:
+          type: array
+          minItems: 2
+          items:
+            $ref: '#/components/schemas/CreateJournalEntryLine'
+    LedgerLine:
+      allOf:
+        - $ref: '#/components/schemas/JournalEntryLine'
+        - type: object
+          properties:
+            id:
+              type: integer
+            journalEntryId:
+              type: integer
+            journalEntry:
+              type: object
+              properties:
+                id:
+                  type: integer
+                entryDate:
+                  type: string
+                  format: date-time
+                description:
+                  type: string
+    FinancialReport:
+      type: object
+      properties:
+        bs:
+          type: object
+          properties:
+            asset:
+              type: number
+            liability:
+              type: number
+            equity:
+              type: number
+        pl:
+          type: object
+          properties:
+            revenue:
+              type: number
+            expense:
+              type: number
+            netIncome:
+              type: number
+    DeleteSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
