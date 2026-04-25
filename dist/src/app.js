@@ -5,7 +5,21 @@ import { journalEntriesRoutes } from "./routes/journalEntries.js";
 import { reportsRoutes } from "./routes/reports.js";
 import { basicAuthMiddleware } from "./middleware/basicAuth.js";
 export const app = new Hono();
-app.use('/*', cors());
+const allowedCorsOrigins = (process.env.CORS_ORIGINS ?? 'http://localhost:3000')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+app.use('/*', cors({
+    origin: (origin) => {
+        if (!origin) {
+            return undefined;
+        }
+        return allowedCorsOrigins.includes(origin) ? origin : null;
+    },
+    allowHeaders: ['Content-Type', 'Authorization'],
+    allowMethods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+    maxAge: 600
+}));
 app.get('/health', (c) => {
     return c.text('ok');
 });

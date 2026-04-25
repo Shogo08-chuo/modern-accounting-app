@@ -1,0 +1,17 @@
+db_password         = "change_me_rds_password"
+basic_auth_user     = "admin"
+basic_auth_password = "change_me_strong_password"
+
+# Add custom domains here if you attach one later. The ALB origin is allowed automatically.
+cors_allowed_origins = [
+  "http://localhost:3000"
+]
+
+app_image_tag      = "latest"
+frontend_image_tag = "latest"
+
+# Optional: enable Route 53 + ACM + HTTPS for a custom domain.
+# custom_domain_name = "app.example.com"
+# route53_zone_name  = "example.com"
+# or:
+# route53_zone_id = "Z0123456789ABCDEFG"

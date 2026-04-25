@@ -35,7 +35,7 @@ type LedgerEntry = JournalEntry & {
 }
 
 const emptySubscribe = () => () => {}
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3001'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? '/api/backend'
 
 function calculateSignedAmount(category: string, lineType: 'DEBIT' | 'CREDIT', amount: number) {
   const debitIncreases = category === 'ASSET' || category === 'EXPENSE'

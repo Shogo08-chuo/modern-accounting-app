@@ -1,7 +1,9 @@
 FROM node:20-alpine AS deps
 WORKDIR /app
 COPY package*.json ./
+COPY prisma ./prisma
 RUN npm ci
+RUN npx prisma generate
 
 FROM node:20-alpine AS build
 WORKDIR /app
@@ -17,4 +19,4 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY prisma ./prisma
 EXPOSE 3001
-CMD ["npm", "run", "start"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npm run start"]
