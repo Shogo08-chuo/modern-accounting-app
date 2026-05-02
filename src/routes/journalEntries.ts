@@ -80,7 +80,7 @@ function buildJournalEntriesWhere(filters: {
   return { AND: conditions }
 }
 
-function validateJournalEntryPayload(body: unknown):
+export function validateJournalEntryPayload(body: unknown):
   | { data: JournalEntryPayload }
   | { error: string } {
   if (!body || typeof body !== 'object') {

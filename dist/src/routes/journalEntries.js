@@ -51,7 +51,7 @@ function buildJournalEntriesWhere(filters) {
     }
     return { AND: conditions };
 }
-function validateJournalEntryPayload(body) {
+export function validateJournalEntryPayload(body) {
     if (!body || typeof body !== 'object') {
         return { error: 'リクエストボディが不正です' };
     }

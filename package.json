@@ -4,10 +4,11 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/src/index.js"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "start": "node dist/src/index.js",
+    "test": "tsx --test test/**/*.test.ts",
+    "prisma:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "prisma db seed"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.14",
