@@ -1,8 +1,11 @@
 import 'dotenv/config'
 
+import { PrismaPg } from '@prisma/adapter-pg'
 import { AccountCategory, PrismaClient } from '@prisma/client'
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient({
+  adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
+})
 
 const seedAccounts = [
   { code: '100', name: '現金', category: AccountCategory.ASSET },

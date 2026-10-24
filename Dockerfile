@@ -18,5 +18,6 @@ COPY package*.json ./
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY prisma ./prisma
+COPY prisma.config.ts ./
 EXPOSE 3001
 CMD ["sh", "-c", "npx prisma migrate deploy && npm run start"]
