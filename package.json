@@ -11,15 +11,15 @@
     "db:seed": "prisma db seed"
   },
   "dependencies": {
-    "@hono/node-server": "^1.19.14",
+    "@hono/node-server": "^1.19.17",
     "@prisma/client": "^6.19.3",
     "dotenv": "^16.6.1",
-    "hono": "^4.12.14",
+    "hono": "^4.13.13",
     "prisma": "^6.19.3"
   },
   "devDependencies": {
-    "@types/node": "^20.11.17",
-    "tsx": "^4.7.1",
-    "typescript": "^5.8.3"
+    "@types/node": "^20.19.43",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
   }
 }
