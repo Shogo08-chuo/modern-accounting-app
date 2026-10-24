@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { prisma } from "../lib/prisma.js";
+import { prisma } from '../lib/prisma.js';
 export const accountsRoutes = new Hono();
 accountsRoutes.get('/accounts', async (c) => {
     const accounts = await prisma.account.findMany();

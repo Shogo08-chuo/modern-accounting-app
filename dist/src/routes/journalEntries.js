@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { Hono } from 'hono';
-import { prisma } from "../lib/prisma.js";
+import { prisma } from '../lib/prisma.js';
 const router = new Hono();
 function parseJournalEntriesQuery(query) {
     const accountIdParam = query.accountId;

@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { prisma } from "../lib/prisma.js";
+import { prisma } from '../lib/prisma.js';
 export const reportsRoutes = new Hono();
 reportsRoutes.get('/reports/all-lines', async (c) => {
     const lines = await prisma.journalEntryLine.findMany({

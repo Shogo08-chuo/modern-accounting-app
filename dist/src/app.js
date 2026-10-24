@@ -1,9 +1,9 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { accountsRoutes } from "./routes/accounts.js";
-import { journalEntriesRoutes } from "./routes/journalEntries.js";
-import { reportsRoutes } from "./routes/reports.js";
-import { basicAuthMiddleware } from "./middleware/basicAuth.js";
+import { accountsRoutes } from './routes/accounts.js';
+import { journalEntriesRoutes } from './routes/journalEntries.js';
+import { reportsRoutes } from './routes/reports.js';
+import { basicAuthMiddleware } from './middleware/basicAuth.js';
 export const app = new Hono();
 const allowedCorsOrigins = (process.env.CORS_ORIGINS ?? 'http://localhost:3000')
     .split(',')
